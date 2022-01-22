@@ -24,9 +24,12 @@
     "devise token auth",
     "token authentication"
   ],
+  "dependencies": {
+    "tslib": "^2.0.0"
+  },
 
   "peerDependencies": {
-    "@angular/common": "^9.0.0",
-    "@angular/core": "^9.0.0"
+    "@angular/common": ">=9.0.0 <11",
+    "@angular/core": ">=9.0.0 <11"
   }
 }
