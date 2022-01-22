@@ -11,7 +11,8 @@ import {
   ResetPasswordData,
   AuthData,
   UserData,
-  AngularTokenOptions
+  AngularTokenOptions,
+  ApiResponse
 } from './angular-token.model';
 
 describe('AngularTokenService', () => {
@@ -186,7 +187,6 @@ describe('AngularTokenService', () => {
     });
 
     it('signIn should POST data', () => {
-
       service.signIn(signInData);
 
       const req = backend.expectOne({
@@ -198,7 +198,6 @@ describe('AngularTokenService', () => {
     });
 
     it('signIn method should set local storage', () => {
-
       service.signIn(signInData).subscribe(data => {
         expect(localStorage.getItem('accessToken')).toEqual(accessToken);
         expect(localStorage.getItem('client')).toEqual(client);
@@ -219,7 +218,6 @@ describe('AngularTokenService', () => {
     });
 
     it('signOut should DELETE', () => {
-
       service.signOut().subscribe();
 
       backend.expectOne({
@@ -227,11 +225,7 @@ describe('AngularTokenService', () => {
         method: 'DELETE'
       });
 
-      expect(localStorage.getItem('accessToken')).toBeNull();
-      expect(localStorage.getItem('client')).toBeNull();
-      expect(localStorage.getItem('expiry')).toBeNull();
-      expect(localStorage.getItem('tokenType')).toBeNull();
-      expect(localStorage.getItem('uid')).toBeNull();
+      backend.verify();
     });
 
 
@@ -242,23 +236,25 @@ describe('AngularTokenService', () => {
       localStorage.setItem('client', client);
       localStorage.setItem('expiry', expiry);
 
-      service.signOut().subscribe( data => {
-        expect(localStorage.getItem('accessToken')).toBe(null);
-        expect(localStorage.getItem('client')).toBe(null);
-        expect(localStorage.getItem('expiry')).toBe(null);
-        expect(localStorage.getItem('tokenType')).toBe(null);
-        expect(localStorage.getItem('uid')).toBe(null);
-      });
+      service.signOut().subscribe();
 
-      backend.expectOne({
+      const result = backend.expectOne({
         url: 'auth/sign_out',
         method: 'DELETE'
       });
+
+      result.flush({} as ApiResponse);
+      backend.verify();
+
+      expect(localStorage.getItem('accessToken')).toBe(null);
+      expect(localStorage.getItem('client')).toBe(null);
+      expect(localStorage.getItem('expiry')).toBe(null);
+      expect(localStorage.getItem('tokenType')).toBe(null);
+      expect(localStorage.getItem('uid')).toBe(null);
     });
 
     describe('registerAccount should POST data', () => {
       it('with standard fields', () => {
-
         service.registerAccount(registerData).subscribe();
 
         const req = backend.expectOne({
@@ -270,7 +266,6 @@ describe('AngularTokenService', () => {
       });
 
       it('with custom fields', () => {
-
         service.registerAccount(registerCustomFieldsData).subscribe();
 
         const req = backend.expectOne({
@@ -284,7 +279,6 @@ describe('AngularTokenService', () => {
     });
 
     it('validateToken should GET', () => {
-
       service.validateToken();
 
       backend.expectOne({
@@ -294,7 +288,6 @@ describe('AngularTokenService', () => {
     });
 
     it('validateToken should not call signOut when it returns status 401', () => {
-
       const signOutSpy = spyOn(service, 'signOut');
 
       service.validateToken().subscribe(() => {}, () => expect(signOutSpy).not.toHaveBeenCalled());
@@ -313,7 +306,6 @@ describe('AngularTokenService', () => {
     });
 
     it('updatePassword should PUT', () => {
-
       service.updatePassword(updatePasswordData).subscribe();
 
       const req = backend.expectOne({
@@ -325,7 +317,6 @@ describe('AngularTokenService', () => {
     });
 
     it('resetPassword should POST', () => {
-
       service.resetPassword(resetPasswordData).subscribe();
 
       const req = backend.expectOne({
@@ -363,7 +354,6 @@ describe('AngularTokenService', () => {
     });
 
     it('signIn should POST data', () => {
-
       service.signIn(signInData);
 
       const req = backend.expectOne({
@@ -375,7 +365,6 @@ describe('AngularTokenService', () => {
     });
 
     it('signOut should DELETE', () => {
-
       service.signOut().subscribe();
 
       backend.expectOne({
@@ -385,7 +374,6 @@ describe('AngularTokenService', () => {
     });
 
     it('registerAccount should POST data', () => {
-
       service.registerAccount(registerData).subscribe();
 
       const req = backend.expectOne({
@@ -397,7 +385,6 @@ describe('AngularTokenService', () => {
     });
 
     it('validateToken should GET', () => {
-
       service.validateToken();
 
       backend.expectOne({
@@ -407,7 +394,6 @@ describe('AngularTokenService', () => {
     });
 
     it('updatePassword should PUT', () => {
-
       service.updatePassword(updatePasswordData).subscribe();
 
       const req = backend.expectOne({
@@ -440,7 +426,6 @@ describe('AngularTokenService', () => {
     });
 
     it('validateToken should call signOut when it returns status 401', () => {
-
       const signOutSpy = spyOn(service, 'signOut');
 
       service.validateToken().subscribe(() => {}, () => expect(signOutSpy).toHaveBeenCalled() );
